@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nhắc món cho tiếp thực</title><link rel="stylesheet" href="/runner.css"><script src="/runner.js" defer></script></head>
+<body><main><header><h1>Nhắc món cho tiếp thực</h1><p id="connection">Chưa kết nối</p></header>
+<section id="activation"><label>Khóa thiết bị do quản lý cấp<input id="device-key" type="password" autocomplete="off"></label>
+<button id="enable">Bật loa và kết nối</button><button id="test-voice" type="button">Thử giọng nói</button></section>
+<section class="toolbar"><strong id="count">0 món đang chờ</strong><button id="read-queue" type="button">Đọc danh sách đang chờ</button></section>
+<section id="queue" aria-live="polite"></section>
+<p class="note">Khi món đã đến bàn, bấm “Đã phục vụ”. Nếu không bấm, hệ thống sẽ tiếp tục nhắc. Thời gian tính từ lúc ứng dụng lần đầu nhìn thấy món trong API CUKCUK.</p>
+</main></body></html>

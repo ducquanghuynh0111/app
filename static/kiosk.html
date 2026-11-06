@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chấm công tại quán</title><link rel="stylesheet" href="/style.css"><script src="/kiosk.js" defer></script></head>
+<body><main><section class="card"><h1>Chấm công tại quán</h1>
+<p>Quản lý mở máy chấm công bằng khóa thiết bị. Nhân viên nhập tài khoản và PIN của mình; giờ được ghi trên máy chủ.</p>
+<form id="punch"><label>Tài khoản nhân viên<input name="username" autocomplete="off" required></label>
+<label>PIN 6–8 số<input name="pin" type="password" inputmode="numeric" minlength="6" maxlength="8" autocomplete="off" required></label>
+<label>Khóa thiết bị<input name="device_key" type="password" autocomplete="off" required></label>
+<button type="submit" name="event" value="check-in">Chấm vào</button>
+<button type="submit" name="event" value="check-out">Chấm ra</button></form>
+<div id="kiosk-message" role="status" aria-live="polite"></div></section></main></body></html>

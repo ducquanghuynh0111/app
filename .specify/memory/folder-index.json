@@ -1,0 +1,81 @@
+﻿{
+    "updatedAt":  "2026-11-04T04:39:01Z",
+    "folders":  [
+                    {
+                        "path":  ".agents/skills/speckit-analyze",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  ".agents/skills/speckit-checklist",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  ".agents/skills/speckit-clarify",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  ".agents/skills/speckit-constitution",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  ".agents/skills/speckit-converge",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  ".agents/skills/speckit-implement",
+                        "readAt":  "2026-11-04T04:23:30Z"
+                    },
+                    {
+                        "path":  ".agents/skills/speckit-plan",
+                        "readAt":  "2026-11-04T04:23:28Z"
+                    },
+                    {
+                        "path":  ".agents/skills/speckit-specify",
+                        "readAt":  "2026-11-04T04:23:28Z"
+                    },
+                    {
+                        "path":  ".agents/skills/speckit-tasks",
+                        "readAt":  "2026-11-04T04:23:29Z"
+                    },
+                    {
+                        "path":  ".specify",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  ".specify/integrations",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  ".specify/memory",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  ".specify/scripts",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  ".specify/scripts/powershell",
+                        "readAt":  "2026-11-04T03:54:09Z"
+                    },
+                    {
+                        "path":  ".specify/templates",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  ".specify/workflows",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  ".specify/workflows/speckit",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  "specs",
+                        "readAt":  ""
+                    },
+                    {
+                        "path":  "specs/001-restaurant-control",
+                        "readAt":  ""
+                    }
+                ]
+}

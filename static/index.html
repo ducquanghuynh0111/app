@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sổ kiểm soát quán</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/zone-layout.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header><div><strong>Sổ kiểm soát quán</strong><small>Đối soát ca · Kho · Nhân sự</small></div><div id="identity"></div></header>
+  <main>
+    <section id="auth" class="card">
+      <div id="setup">
+        <h1>Thiết lập chủ quán</h1>
+        <p>Tạo tài khoản đầu tiên. Tên đăng nhập mặc định là <strong>owner</strong>.</p>
+        <form data-action="setup">
+          <label>Tên hiển thị<input name="name" required maxlength="80"></label>
+          <label>Mật khẩu (ít nhất 12 ký tự)<input name="password" type="password" required minlength="12"></label>
+          <button>Thiết lập</button>
+        </form>
+      </div>
+      <div id="login">
+        <h1>Đăng nhập</h1>
+        <form data-action="login">
+          <label>Tên đăng nhập<input name="username" autocomplete="username" required></label>
+          <label>Mật khẩu<input name="password" type="password" autocomplete="current-password" required></label>
+          <button>Đăng nhập</button>
+        </form>
+      </div>
+    </section>
+    <div id="workspace" hidden>
+      <nav aria-label="Chức năng">
+        <button data-tab="overview" class="active">Tổng quan</button>
+        <button data-tab="process">Quy trình</button>
+        <button data-tab="cash" disabled aria-disabled="true" title="Chưa hoàn thiện">Đối soát tiền</button>
+        <button data-tab="inventory">Kho</button>
+        <button data-tab="zones">Khu & rà soát</button>
+        <button data-tab="statistics">Thống kê</button>
+        <button data-tab="people" disabled aria-disabled="true" title="Chưa hoàn thiện">Nhân viên</button>
+        <button data-tab="import" disabled aria-disabled="true" title="Chưa hoàn thiện">Nhập CUKCUK</button>
+      </nav>
+      <section id="overview" class="tab">
+        <h1>Tổng quan vận hành</h1>
+        <div id="metrics" class="metrics"></div>
+        <div class="card"><h2>Ca tiền gần đây</h2><div id="cash-summary"></div></div>
+        <div class="card"><h2>Hàng dưới tồn tối thiểu</h2><div id="low-stock"></div></div>
+        <div class="card"><h2>Kiểm kê chờ duyệt</h2><div id="pending-counts"></div></div>
+        <div class="card manager"><h2>Nhật ký thao tác</h2><div id="audit-table"></div></div>
+      </section>
+      <section id="process" class="tab" hidden>
+        <p><a href="/runner" target="_blank" rel="noopener">Mở màn hình đọc và nhắc món cho tiếp thực</a></p>
+        <h1>Quy trình theo ca</h1>
+        <div class="grid">
+          <div class="card"><h2>Đầu ca</h2><p>Nhân viên tự chấm vào. Thu ngân ghi tiền đầu ca. Kho kiểm nhanh bia, thuốc và hàng dễ thất thoát; bếp báo món hết.</p></div>
+          <div class="card"><h2>Nhận và làm món</h2><p>Phục vụ xác nhận bàn, món, số lượng, ghi chú trước khi gửi order trong CUKCUK. Bếp làm theo bill in. Tiếp thực đối chiếu bàn, món và số lượng trước khi bưng.</p></div>
+          <div class="card"><h2>Khi có sai sót</h2><p>Thay đổi/hủy món phải cập nhật trong CUKCUK. Sai, thiếu, chậm hoặc trả món ghi sự cố với mã bill/order; quản lý xác minh nguyên nhân.</p></div>
+          <div class="card"><h2>Cuối ca</h2><p>Thu ngân lấy báo cáo CUKCUK, đếm tiền và đối chiếu giao dịch chuyển khoản. Kho kiểm hàng trọng yếu. Quản lý xử lý chênh lệch rồi khóa ca.</p></div>
+        </div>
+      </section>
+      <section id="cash" class="tab" hidden>
+        <h1>Đối soát tiền theo ca</h1>
+        <div class="grid">
+          <div class="card"><h2>Mở ca</h2><form data-action="open-shift">
+            <label>Tên ca<input name="label" placeholder="Ca tối 04/11" required></label>
+            <label>Tiền mặt đầu ca (VND)<input name="opening_cash" type="number" min="0" value="0" required></label><button>Mở ca</button>
+          </form></div>
+          <div class="card"><h2>Nhập số liệu cuối ca</h2><form data-action="update-shift">
+            <label>Ca<select name="shift_id" data-select="cash"></select></label>
+            <label>CUKCUK tiền mặt<input name="manual_cash" type="number" min="0" value="0" required></label>
+            <label>CUKCUK chuyển khoản<input name="manual_bank" type="number" min="0" value="0" required></label>
+            <label>Tiền mặt đếm được<input name="counted_cash" type="number" min="0" required></label>
+            <label>Chuyển khoản thực nhận<input name="counted_bank" type="number" min="0" required></label>
+            <label>Ghi chú<input name="note"></label><button>Lưu đối soát</button>
+          </form></div>
+          <div class="card"><h2>Thu chi ngoài bill</h2><form data-action="cash-entry">
+            <label>Ca<select name="shift_id" data-select="cash"></select></label>
+            <label>Loại<select name="kind"><option value="income">Thu khác</option><option value="expense">Chi</option><option value="refund">Hoàn tiền</option></select></label>
+            <label>Kênh<select name="method"><option value="cash">Tiền mặt</option><option value="bank">Chuyển khoản</option></select></label>
+            <label>Số tiền<input name="amount" type="number" min="1" required></label>
+            <label>Lý do<input name="note" required></label>
+            <label>Mã chứng từ<input name="reference"></label><button>Ghi thu chi</button>
+          </form></div>
+          <div class="card"><h2>Khóa ca</h2><form data-action="close-shift">
+            <label>Ca<select name="shift_id" data-select="cash"></select></label>
+            <label>Lý do chênh lệch (nếu có)<textarea name="reason"></textarea></label><button>Khóa ca</button>
+          </form></div>
+        </div>
+        <div class="card"><h2>Danh sách ca</h2><div id="cash-table"></div><a href="/api/report.csv" target="_blank">Tải báo cáo CSV</a></div>
+        <div class="card"><h2>Thu chi gần đây</h2><div id="entries-table"></div></div>
+      </section>
+      <section id="inventory" class="tab" hidden>
+        <div class="inventory-subtabs" role="tablist" aria-label="Nhóm kiểm kê">
+          <button type="button" data-inventory-tab="saleable" aria-selected="true">1. Bia, nước, đồ ăn kèm, thuốc</button>
+          <button type="button" data-inventory-tab="dry" disabled aria-disabled="true" title="Chưa triển khai">2. Đồ khô, gia vị</button>
+          <button type="button" data-inventory-tab="vegetable" disabled aria-disabled="true" title="Chưa triển khai">3. Rau</button>
+          <button type="button" data-inventory-tab="daily-use" disabled aria-disabled="true" title="Chưa triển khai">4. Đá, than</button>
+        </div>
+        <div data-inventory-panel="saleable">
+          <div class="card saleable-section-card saleable-entry-card"><div class="saleable-section-heading"><span class="saleable-section-number">01</span><div><h2>Kiểm tra hàng</h2><p>Nhập hàng đầu ngày và kiểm số còn thực tế cuối ngày.</p></div></div>
+            <form data-action="bulk-count-load"><label>Ngày<input name="day" type="date" required></label>
+              <label>Mốc kiểm<select name="phase"><option value="opening">Đầu ngày · nhập hàng</option><option value="closing">Cuối ngày · tồn thực tế</option></select></label>
+            </form>
+            <p id="bulk-count-status"></p>
+            <div id="bulk-count-entry" hidden>
+              <div class="bulk-count-toolbar"><label>Tìm mặt hàng<input id="bulk-count-search" type="search" placeholder="Nhập tên mặt hàng" autocomplete="off"></label><span id="bulk-count-visible-count" aria-live="polite"></span></div>
+              <div id="bulk-count-inputs"></div>
+              <div class="bulk-count-actions"><button type="button" id="bulk-count-opening">Nhập hàng</button><button type="button" id="bulk-count-closing" hidden>Kiểm hàng</button></div>
+            </div>
+            <div id="bulk-count-confirm" hidden><h3>Xác nhận số lượng</h3><div id="bulk-count-preview"></div>
+              <button type="button" id="bulk-count-edit">Sửa lại</button> <button type="button" id="bulk-count-save">Xác nhận lưu</button></div>
+            <form data-action="quick-item" id="quick-item-form" class="inline-entry" hidden>
+              <label>Mã CUKCUK<input name="code" required maxlength="40"></label>
+              <label>Hàng<input name="name" required maxlength="100"></label>
+              <label>Nhóm<select name="group_name" required><option value="beer">Bia</option><option value="liquor">Rượu</option><option value="soft_drink">Nước ngọt</option><option value="water">Nước uống</option><option value="rice_paper">Bánh tráng</option><option value="peanuts">Đậu phộng</option><option value="tobacco">Thuốc</option></select></label>
+              <label>Đơn vị<select name="unit" required><option value="Lon">Lon</option><option value="Chai">Chai</option><option value="Gói">Gói</option></select></label>
+              <label id="quick-item-carton-label"><span>Đơn vị mỗi thùng</span><input name="units_per_carton" type="number" min="1" max="1000" step="1" required></label>
+              <button>Thêm vào bảng</button>
+            </form>
+          </div>
+          <div class="card saleable-section-card saleable-result-card"><div class="saleable-section-heading"><span class="saleable-section-number">02</span><div><h2>Tồn kho và thất thoát</h2><p>Tính kết quả từ những số bạn đã nhập và hóa đơn đã đồng bộ.</p></div></div>
+            <button type="button" id="calculate-daily-stock">Tính kết quả từ số đã nhập</button>
+            <p id="daily-stock-status">Nhập các mặt hàng cần kiểm rồi bấm Tính kết quả.</p><div id="daily-stock-table"></div>
+          </div>
+          <details class="card saleable-section-card saleable-history-panel"><summary class="saleable-panel-summary"><span class="saleable-section-number">03</span><span class="saleable-panel-title">Thống kê theo ngày<small>Bấm để chọn kỳ và xem số liệu</small></span></summary><div class="saleable-section-body">
+            <form id="saleable-history-filter" class="saleable-history-filter">
+              <label>Xem theo<select name="period"><option value="day">Ngày</option><option value="week">Tuần</option><option value="month">Tháng</option></select></label>
+              <label>Ngày chọn<input name="anchor" type="date" required></label>
+              <button type="submit">Xem thống kê</button>
+            </form>
+            <p id="saleable-history-status" class="muted"></p>
+            <div id="saleable-history-days"></div>
+          </div></details>
+        </div>
+        <div data-inventory-panel="dry" hidden>
+          <div class="card"><h2>Đồ khô và gia vị</h2><p>Kiểm theo tuần hoặc kiểm đột xuất; theo dõi hao hụt và hạn dùng, không lấy chỉ tiêu giảm gia vị làm chuẩn chất lượng.</p><div id="dry-items"></div></div>
+          <div class="card"><h2>Đối chiếu theo ngày</h2><form data-action="daily-report"><label>Ngày báo cáo<input name="day" type="date" required></label><button>Xem đối chiếu</button></form><div id="dry-stock-table"></div></div>
+        <div class="card"><h2>Định mức món → nguyên liệu</h2><p>Dùng đúng mã món CUKCUK. Số lượng cho một món phải tính theo đơn vị kho đã khai báo; cập nhật công thức khi bếp thay đổi cách làm.</p>
+          <form data-action="recipe"><label>Mã món CUKCUK<input name="item_code" required></label>
+            <label>Nguyên liệu<select name="ingredient_id" data-select="item"></select></label>
+            <label>Lượng cho 1 món<input name="quantity_per_unit" type="number" min="0.001" step="0.001" required></label><button>Lưu định mức</button></form>
+        </div>
+        </div>
+        <div data-inventory-panel="vegetable" hidden>
+          <div class="card"><h2>Rau</h2><p>Ghi nhập, hỏng và số đếm thực tế theo ngày. Chỉ tính tiêu hao lý thuyết khi đã khai định mức món tương ứng.</p><div id="vegetable-items"></div></div>
+          <div class="card"><h2>Đối chiếu theo ngày</h2><form data-action="daily-report"><label>Ngày báo cáo<input name="day" type="date" required></label><button>Xem đối chiếu</button></form><div id="vegetable-stock-table"></div></div>
+        </div>
+        <div data-inventory-panel="daily-use" hidden>
+          <div class="card"><h2>Đá và than dùng theo ngày</h2><p>Ghi số lượng thực tế đã dùng, không trừ tự động theo món.</p>
+            <form data-action="daily-usage"><label>Ngày<input name="day" type="date" required></label>
+              <label>Đá hoặc than<select name="item_id" data-select="daily-use-item" required></select></label>
+              <label>Số lượng dùng<input name="quantity" type="number" min="0.001" step="0.001" required></label>
+              <label>Ghi chú<input name="note"></label><button>Ghi lượng dùng</button></form>
+            <form data-action="daily-usage-report"><label>Từ ngày<input name="from" type="date" required></label>
+              <label>Đến ngày<input name="to" type="date" required></label><button>Xem thống kê</button></form>
+            <div id="daily-usage-table"></div>
+          </div>
+        </div>
+        <div id="shared-stock-admin" hidden><h1>Kho và kiểm kê</h1>
+        <div class="grid">
+          <div class="card"><h2>Thêm mặt hàng</h2><form data-action="item">
+            <label>Mã hàng<input name="code" required></label><label>Tên<input name="name" required></label>
+            <label>Nhóm<select name="group_name"><option value="beer">Bia</option><option value="liquor">Rượu</option><option value="soft_drink">Nước ngọt</option><option value="water">Nước uống</option><option value="rice_paper">Bánh tráng</option><option value="peanuts">Đậu phộng</option><option value="tobacco">Thuốc</option><option value="dry_good">Đồ khô</option><option value="spice">Gia vị</option><option value="sauce">Nước chấm</option><option value="vegetable">Rau</option><option value="ice">Đá</option><option value="coal">Than</option><option value="ingredient">Nguyên liệu khác</option><option value="other">Khác</option></select></label>
+            <label>Đơn vị<input name="unit" placeholder="lon, gói, kg, lít" required></label>
+            <label>Tồn tối thiểu<input name="min_stock" type="number" step="0.001" min="0" value="0" required></label><button>Thêm hàng</button>
+          </form></div>
+          <div class="card"><h2>Nhập/xuất hàng</h2><form data-action="stock-move">
+            <label>Hàng<select name="item_id" data-select="item"></select></label>
+            <label>Loại<select name="kind"><option value="receipt">Nhập</option><option value="sale">Bán thủ công</option><option value="waste">Hao hụt</option><option value="gift">Biếu</option><option value="return">Trả lại kho</option></select></label>
+            <label>Số lượng<input name="quantity" type="number" step="0.001" min="0.001" required></label>
+            <label>Lý do<input name="reason"></label><label>Chứng từ<input name="reference"></label><button>Ghi sổ kho</button>
+          </form></div>
+          <div class="card"><h2>Kiểm kê thực tế</h2><form data-action="stock-count">
+            <label>Hàng<select name="item_id" data-select="item"></select></label>
+            <label>Số đếm được<input name="counted_qty" type="number" step="0.001" min="0" required></label>
+            <label>Ghi chú<input name="note"></label><button>Tạo phiếu kiểm kê</button>
+          </form></div>
+          <div class="card"><h2>Duyệt kiểm kê</h2><form data-action="approve-count">
+            <label>Phiếu<select name="count_id" data-select="count"></select></label>
+            <label>Lý do điều chỉnh<input name="reason" required></label><button>Duyệt chênh lệch</button>
+          </form></div>
+        </div>
+        <div class="card"><h2>Sổ kho chi tiết</h2><div id="items-table"></div><a href="/api/stock-report.csv" target="_blank">Tải báo cáo tồn kho CSV</a></div>
+        <div class="card"><h2>Lịch sử kiểm kê</h2><div id="counts-table"></div></div></div>
+      </section>
+      <section id="people" class="tab" hidden>
+        <div class="card manager"><h2>PIN chấm công tại máy chung</h2><p>Phân ca trước khi chấm công. Mỗi nhân viên có PIN riêng. Trên máy chung mở <a href="/kiosk" target="_blank" rel="noopener">trang chấm công</a>.</p>
+          <form data-action="kiosk-pin"><label>Nhân viên<select name="user_id" data-select="user"></select></label>
+            <label>PIN mới (6–8 số)<input name="pin" type="password" inputmode="numeric" minlength="6" maxlength="8" required></label><button>Đặt PIN</button></form></div>
+        <h1>Nhân viên và order</h1>
+        <div class="grid">
+          <div class="card manager"><h2>Thêm nhân viên</h2><form data-action="user">
+            <label>Tài khoản<input name="username" required></label><label>Tên hiển thị<input name="name" required></label>
+            <label>Vai trò<select name="role"><option value="staff">Nhân viên</option><option value="cashier">Thu ngân</option><option value="stock">Kho/bếp</option><option value="manager">Quản lý</option></select></label>
+            <label>Bộ phận<select name="department"><option value="service">Phục vụ</option><option value="kitchen">Bếp</option><option value="runner">Tiếp thực</option><option value="cashier">Thu ngân</option><option value="management">Quản lý</option><option value="other">Khác</option></select></label>
+            <label>Mật khẩu ban đầu (12+ ký tự)<input name="password" type="password" minlength="12" required></label><button>Tạo tài khoản</button>
+          </form></div>
+          <div class="card manager"><h2>Phân ca</h2><form data-action="work-shift">
+            <label>Nhân viên<select name="user_id" data-select="user"></select></label>
+            <label>Bắt đầu<input name="starts_at" type="datetime-local" required></label>
+            <label>Kết thúc<input name="ends_at" type="datetime-local" required></label><button>Phân ca</button>
+          </form></div>
+          <div class="card"><h2>Chấm công</h2><form data-action="attendance">
+            <label>Ca làm<select name="work_shift_id" data-select="work"></select></label>
+            <label>Thao tác<select name="event"><option value="check-in">Chấm vào</option><option value="check-out">Chấm ra</option></select></label><button>Ghi nhận</button>
+          </form></div>
+          <div class="card incident-entry"><h2>Sự cố order</h2><form data-action="incident">
+            <label>Mã bill<input name="bill_ref" required></label>
+            <label>Loại lỗi<input name="category" placeholder="Sai món, hủy bill..." required></label>
+            <label>Mô tả<textarea name="description" required></textarea></label>
+            <label>Giá trị ước tính (VND)<input name="amount" type="number" min="0" value="0"></label>
+            <label>Nhân viên liên quan<select name="user_id" data-select="user-optional"></select></label><button>Ghi sự cố</button>
+          </form></div>
+        </div>
+        <div class="card"><h2>Lịch và giờ công</h2><div id="work-table"></div></div>
+        <div class="card"><h2>Sự cố cần xử lý</h2><div id="incident-table"></div></div>
+        <div class="card manager"><h2>Xác minh sự cố</h2><form data-action="resolve-incident">
+          <label>Mã sự cố<select name="incident_id" data-select="incident"></select></label>
+          <label>Kết quả xác minh<input name="reason" required></label><button>Đánh dấu đã xử lý</button>
+        </form></div>
+        <div class="card manager"><h2>Chỉ số quan sát theo nhân viên</h2><p>Đây là dữ liệu vận hành, không phải điểm đánh giá tự động.</p><div id="staff-metrics"></div></div>
+      </section>
+      <section id="zones" class="tab" hidden>
+        <div class="zone-toolbar"><div><h1>Khu theo nhân viên</h1><p class="muted">Mỗi thẻ mang tên người phụ trách và các bàn của người đó.</p></div>
+          <div class="zone-toolbar-actions"><button type="button" class="secondary" id="zone-demo">Xem dữ liệu mẫu</button>
+            <button type="button" id="zone-add">+ Thêm khu</button></div></div>
+        <p id="zone-review-status" class="muted"></p>
+        <button type="button" class="secondary" id="zone-refresh-orders">Cập nhật order bàn đang mở</button>
+        <form id="zone-shift-form" class="zone-shift-toolbar">
+          <label>Ngày xem theo khu<input name="day" type="date" required></label>
+          <button type="submit" class="secondary">Tính số sau ca theo khu</button>
+          <span id="zone-shift-status" class="muted"></span>
+        </form>
+        <div class="zone-board-scroll"><div id="zone-list" class="zone-card-grid"></div></div>
+        <div class="card zone-unassigned" id="zone-unassigned" hidden></div>
+        <dialog id="zone-table-dialog" class="zone-table-dialog" aria-labelledby="zone-table-dialog-title">
+          <div class="zone-table-dialog-header"><h2 id="zone-table-dialog-title"></h2><button type="button" class="secondary" id="zone-table-dialog-close">Đóng</button></div>
+          <div id="zone-table-dialog-body"></div>
+        </dialog>
+      </section>
+      <section id="statistics" class="tab" hidden>
+        <h1>Thống kê theo khu</h1>
+        <div class="card zone-statistics-card">
+          <form id="zone-statistics-form" class="zone-statistics-filter">
+            <label>Chọn khu<select name="zone_id" required><option value="">Chọn nhân viên/khu</option></select></label>
+            <label>Trạng thái bàn<select name="view"><option value="open">Đang mở</option><option value="closed">Đã đóng</option></select></label>
+            <label class="zone-statistics-day" hidden>Ngày kinh doanh<input name="day" type="date"></label>
+            <button type="submit">Xem thống kê</button>
+          </form>
+          <p id="zone-statistics-status" class="muted">Chọn khu rồi bấm Xem thống kê.</p>
+          <div id="zone-statistics-result"></div>
+        </div>
+      </section>
+      <section id="import" class="tab" hidden>
+        <div class="card"><h2>Doanh số và mặt hàng từ API CUKCUK</h2>
+          <p>Đồng bộ hóa đơn bằng lệnh trong README. Chỉ tính hóa đơn đã thu tiền. Mã sáu nhóm hàng bán trực tiếp cần trùng mã hàng kho. Hóa đơn không tự trừ kho.</p>
+          <form data-action="cukcuk-filter"><label>Từ ngày<input name="from" type="date" required></label>
+            <label>Đến ngày<input name="to" type="date" required></label><button>Xem báo cáo</button></form>
+          <p id="cukcuk-sync-status"></p>
+          <div id="cukcuk-totals"></div><h3>Hàng bán trực tiếp cần kiểm kê</h3><div id="cukcuk-beer"></div>
+          <h3>Món bán nhiều</h3><div id="cukcuk-products"></div><h3>Theo ngày</h3><div id="cukcuk-days"></div>
+          <h3>Theo tháng</h3><div id="cukcuk-months"></div><h3>Món theo tháng</h3><div id="cukcuk-monthly-items"></div>
+        </div>
+        <h1>Nhập dữ liệu CUKCUK</h1>
+        <div class="card"><p>Bản đầu nhận CSV đã chuẩn hóa với các cột: <strong>source_row_id,item_code,quantity,amount,method</strong>. Mỗi dòng là một dòng bán; method là cash hoặc bank. Mã sáu nhóm hàng bán trực tiếp phải có trong danh mục để tự trừ kho. Chưa nhập trực tiếp file xuất CUKCUK nếu tên cột khác.</p>
+          <form data-action="sales-import">
+            <label>Ca tiền<select name="shift_id" data-select="cash"></select></label>
+            <label>File CSV UTF-8<input name="file" type="file" accept=".csv,text/csv" required></label><button>Nhập bán hàng</button>
+          </form>
+          <div id="csv-preview"></div>
+          <p><a id="sample-csv" href="#">Tải file CSV mẫu</a></p>
+        </div>
+      </section>
+    </div>
+    <div id="message" role="status" aria-live="polite"></div>
+  </main>
+</body>
+</html>
